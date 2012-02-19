@@ -1,0 +1,242 @@
+#!/bin/bash
+
+# Shell prompt settings
+# =============================================================================
+
+# Set the terminal's title.
+function title () {
+	echo -n $'\e]0;'"$@"$'\a';
+}
+
+# Display the process tree inside the prompt for shells that are not at the top
+# level (as determined by $SHLVL).
+function __prompt_display_process_tree () {
+	[ ${SHLVL:-0} -gt 1 ] && echo " (${FONT_REVERSE}level ${SHLVL}${FONT_NOT_REVERSE}: $(process-tree))";
+}
+
+# Display an error message inside the prompt when the previous command has
+# failed. If it was terminated using a signal, display the signal's name. For
+# example, terminating a command using Ctrl+C would display: "[ SIGINT ]".
+# "Normal" error codes display the number, e.g. "[ Error 13 ]".
+function __prompt_display_error () {
+	local ret="$?";
+	if [ "$ret" -eq 0 ]; then
+		local msg="${FG_GREEN}:-)";
+	else
+		local msg="Error $ret";
+
+		# Replace predefined exit codes with their message.
+		if [ "$ret" -eq 127 ]; then
+			msg='Error 127: command not found';
+		elif [ "$ret" -eq 126 ]; then
+			msg='Error 126: permission denied';
+		elif [ "$ret" -ge 129 ]; then
+			# Replace exit codes 129 and up by their signal name.
+			# See http://www.faqs.org/docs/abs/HTML/exitcodes.html for more.
+			set -- $(trap -l);
+			while [ $# -ge 2 ]; do
+				local num="${1%)}";
+				local name="$2";
+				shift 2;
+				if [ "$ret" -eq $((128 + $num)) ]; then
+					msg="$name";
+					break;
+				fi;
+			done;
+		fi;
+		msg="${FG_RED}${FONT_REVERSE}$msg${FONT_NOT_REVERSE}";
+	fi;
+
+	# Show the error message.
+	echo -ne "${FONT_BOLD}$msg${FONT_RESET}${__prompt_color}";
+	return "$ret";
+}
+
+# More advanced prompt.
+if (($UID)); then
+	# You can override this in ~/.bash/extra. For example:
+	# (($UID)) && export __prompt_color="${FONT_BOLD}${FG_BLUE}"
+	__prompt_color="${FG_CYAN}";
+	__prompt_title_user_char=':';
+else
+	__prompt_color="${FG_RED}";
+	__prompt_title_user_char='#';
+fi;
+[[ "$TERM" =~ ^xterm ]] && export PS1=$'\e]0;'"${HOSTNAME%.local}${__prompt_title_user_char} "$'\\W \a'"$PS1";
+type -t git > /dev/null \
+	&& __prompt_vcs_string=' $(git-show-branch)' \
+	|| __prompt_vcs_string='';
+export PS1="\${__prompt_color}-----[ \\t ]$(__prompt_display_process_tree) (!\\!) [ \$(__prompt_display_error) ] \\u@\\h \\w$__prompt_vcs_string\\e[m\\n\\$ ";
+
+# =============================================================================
+# Second prompt
+# =============================================================================
+
+# set variable identifying the chroot you work in (used in the prompt below)
+#if [ -z "$debian_chroot" ] && [ -r /etc/debian_chroot ]; then
+#    debian_chroot=$(cat /etc/debian_chroot)
+#fi
+#PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
+#PS1='\[\033[01;31m\]\w\[\033[00m\]\n${debian_chroot:+($debian_chroot)}\[\033[01;34m\]\u\[\033[01;32m\]@\[\033[01;34m\]\h\[\033[00m\]\$ '
+
+# If this is an xterm set the title to user@host:dir
+#case "$TERM" in
+#xterm*|rxvt*)
+#    PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
+#    ;;
+#*)
+#    ;;
+#esac
+
+# Set up TERM variables.
+# vt100 and xterm have no color in vim (at least on unixs), but if we call them xterm-color, they will.
+# (vt100 for F-Secure SSH.)
+# This may well be the case for some other terms, so I'm putting them here.
+# Also set up a variable to indicate whether to set up the title functions.
+# TODO gnome-terminal, or however it reports itself
+#case $TERM in
+#
+#  screen)
+#    TERM_IS_COLOR=true
+#    TERM_NOT_RECOGNIZED_AS_COLOR_BY_VIM=false
+#    TERM_NOT_RECOGNIZED_BY_SUN_UTILS=false
+#    TERM_CAN_TITLE=true
+#  ;;
+#
+#  xterm-color|color_xterm|rxvt|Eterm|screen*) # screen.linux|screen-w
+#    TERM_IS_COLOR=true
+#    TERM_NOT_RECOGNIZED_AS_COLOR_BY_VIM=false
+#    TERM_NOT_RECOGNIZED_BY_SUN_UTILS=true
+#    TERM_CAN_TITLE=true
+#  ;;
+#
+#  linux)
+#    TERM_IS_COLOR=true
+#    TERM_NOT_RECOGNIZED_AS_COLOR_BY_VIM=false
+#    TERM_NOT_RECOGNIZED_BY_SUN_UTILS=true
+#    TERM_CAN_TITLE=false
+#  ;;
+#
+#  xterm|vt100)
+#    TERM_IS_COLOR=true
+#    TERM_NOT_RECOGNIZED_AS_COLOR_BY_VIM=true
+#    TERM_NOT_RECOGNIZED_BY_SUN_UTILS=false
+#    TERM_CAN_TITLE=true
+#  ;;
+#
+#  *xterm*|eterm|rxvt*)
+#    TERM_IS_COLOR=true
+#    TERM_NOT_RECOGNIZED_AS_COLOR_BY_VIM=true
+#    TERM_NOT_RECOGNIZED_BY_SUN_UTILS=true
+#    TERM_CAN_TITLE=true
+#  ;;
+#
+#  *)
+#    TERM_IS_COLOR=false
+#    TERM_NOT_RECOGNIZED_AS_COLOR_BY_VIM=false
+#    TERM_NOT_RECOGNIZED_BY_SUN_UTILS=false
+#    TERM_CAN_TITLE=false
+#  ;;
+#
+#esac
+
+
+
+# dircolors... make sure that we have a color terminal, dircolors exists, and ls supports it.
+#if $TERM_IS_COLOR && ( dircolors --help && ls --color ) &> /dev/null; then
+  # For some reason, the unixs machines need me to use $HOME instead of ~
+  # List files from highest priority to lowest.  As soon as the loop finds one that works, it will exit.
+#  for POSSIBLE_DIR_COLORS in "$HOME/.dir_colors" "/etc/DIR_COLORS"; do
+#    [[ -f "$POSSIBLE_DIR_COLORS" ]] && [[ -r "$POSSIBLE_DIR_COLORS" ]] && eval `dircolors -b "$POSSIBLE_DIR_COLORS"` && break
+#  done
+#  alias ls="ls --color=auto"
+#  alias ll="ls --color=auto -l"
+#  alias grep='grep --color=auto'
+#  alias fgrep='fgrep --color=auto'
+#  alias egrep='egrep --color=auto'
+#else
+#  # No color, so put a slash at the end of directory names, etc. to differentiate.
+#  alias ls="ls -F"
+#  alias ll="ls -lF"
+#fi
+
+# Set $TERM for libvte terminals that set $TERM wrong (like gnome-terminal)
+#{
+#  [ "_$TERM" = "_xterm" ] && type ldd && type grep && type tput && [ -L "/proc/$PPID/exe" ] && {
+#    if ldd /proc/$PPID/exe | grep libvte; then
+#      if [ "`tput -Txterm-256color colors`" = "256" ]; then
+#        TERM=xterm-256color
+#      elif [ "`tput -Txterm-256color colors`" = "256" ]; then
+#        TERM=xterm-256color
+#      elif tput -T xterm; then
+#        TERM=xterm
+#      fi
+#    fi
+#  }
+#} >/dev/null 2>/dev/null
+
+#parse_git_branch ()
+#{
+#  git name-rev HEAD 2> /dev/null | sed 's#HEAD\ \(.*\)#(git::\1)#'
+#}
+#parse_svn_branch() {
+#  parse_svn_url | sed -e 's#^'"$(parse_svn_repository_root)"'##g' | awk -F / '{print "(svn::"$1 "/" $2 ")"}'
+#}
+#parse_svn_url() {
+#  svn info 2>/dev/null | sed -ne 's#^URL: ##p'
+#}
+#parse_svn_repository_root() {
+#  svn info 2>/dev/null | sed -ne 's#^Repository Root: ##p'
+#}
+# Add git and svn branch names
+#export PS1="$PS1\$(parse_git_branch)\$(parse_svn_branch) "
+
+# =============================================================================
+# Third prompt
+# =============================================================================
+# @gf3’s Sexy Bash Prompt, inspired by “Extravagant Zsh Prompt”
+# Shamelessly copied from https://github.com/gf3/dotfiles
+# Screenshot: http://i.imgur.com/s0Blh.png
+
+#if [[ $COLORTERM = gnome-* && $TERM = xterm ]] && infocmp gnome-256color >/dev/null 2>&1; then
+#	export TERM=gnome-256color
+#elif infocmp xterm-256color >/dev/null 2>&1; then
+#	export TERM=xterm-256color
+#fi
+#
+#if tput setaf 1 &> /dev/null; then
+#	tput sgr0
+#	if [[ $(tput colors) -ge 256 ]] 2>/dev/null; then
+#		MAGENTA=$(tput setaf 9)
+#		ORANGE=$(tput setaf 172)
+#		GREEN=$(tput setaf 190)
+#		PURPLE=$(tput setaf 141)
+#		WHITE=$(tput setaf 256)
+#	else
+#		MAGENTA=$(tput setaf 5)
+#		ORANGE=$(tput setaf 4)
+#		GREEN=$(tput setaf 2)
+#		PURPLE=$(tput setaf 1)
+#		WHITE=$(tput setaf 7)
+#	fi
+#	BOLD=$(tput bold)
+#	RESET=$(tput sgr0)
+#else
+#	MAGENTA="\033[1;31m"
+#	ORANGE="\033[1;33m"
+#	GREEN="\033[1;32m"
+#	PURPLE="\033[1;35m"
+#	WHITE="\033[1;37m"
+#	BOLD=""
+#	RESET="\033[m"
+#fi
+#
+#function parse_git_dirty() {
+#	[[ $(git status 2> /dev/null | tail -n1) != "nothing to commit (working directory clean)" ]] && echo "*"
+#}
+#
+#function parse_git_branch() {
+#	git branch --no-color 2> /dev/null | sed -e '/^[^*]/d' -e "s/* \(.*\)/\1$(parse_git_dirty)/"
+#}
+#
+#PS1="\[${BOLD}${MAGENTA}\]\u \[$WHITE\]at \[$ORANGE\]\h \[$WHITE\]in \[$GREEN\]\w\[$WHITE\]\$([[ -n \$(git branch 2> /dev/null) ]] && echo \" on \")\[$PURPLE\]\$(parse_git_branch)\[$WHITE\]\n\$ \[$RESET\]"

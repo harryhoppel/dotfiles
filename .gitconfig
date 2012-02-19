@@ -1,0 +1,274 @@
+[user]
+    name = Vasiliy Pisar
+    email = vasiliy.pisar@gmail.com
+    
+[advice]
+  statusHints = false
+
+[alias]
+	# add
+	a = add                           # add
+	amend = commit --amend            # ammend your last commit
+	ammend = commit --amend           # ammend your last commit
+
+	b = branch -v                     # branch (verbose)
+    br = branch
+
+	browse       = !hub browse
+	bv           = !git branch --color -v | cut -c1-100
+
+	cb           = !git-cut-branch
+
+	chunkyadd = add --patch           # stage commits chunk by chunk
+    ci = commit
+	# commit
+	c = commit -m                     # commit with message
+	ca = commit -am                   # commit all with message
+	
+	changelog = log --pretty=format:\" * %s\"
+	changes = log --pretty=format:\"%h %cr %cn %Cgreen%s%Creset\" --name-status
+
+	ci = commit                       # commit
+    co = checkout
+
+	compare      = !hub compare
+
+    # cherry-pick
+	cp = cherry-pick -x               # grab a change from a branch
+
+	d = diff                          # diff unstaged changes
+	dc = diff --cached                # diff staged changes
+    df = diff
+
+    diverges = !bash -c 'diff -u <(git rev-list --first-parent "${1}") <(git rev-list --first-parent "${2:-HEAD}") | sed -ne \"s/^ //p\" | head -1' -
+
+	filelog = log -u                  # show changes to a file
+
+	fp           = format-patch --stdout
+
+	# When doing "git git log" or some such, do not complain about "git" not
+	# being a valid Git command. This happens when copy-pasting examples, for
+	# instance.
+	git = !git
+
+	# Switch branches, creating them if necessary. I want to unlearn using
+	# "git checkout" for switching between branches because of the possible
+	# dataloss when not paying attention. (You could see the PEBKAC, but I
+	# could reply with another four letter acronym, slightly resembling TOFU.)
+	#
+	# Suppose I have modified a file named "password" and have two branches,
+	# "password-expiry-mechanism" and "password-reset-mail". If I want to
+	# switch to either branch, I would type "git checkout pass<Tab><Enter>",
+	# but the autocomplete would stop at "git checkout password" because of
+	# the ambiguity. Because I press <Enter> without really thinking, I have
+	# now reset my "password" file. With "git go pass<Tab><Enter>", I would
+	# simply have created a new branch called "password". (I would be forced
+	# to use "--" to separate paths from banch names, which is a Good Thing™.)
+	go = checkout -B
+
+	grab         = !git-grab
+
+	in           = !git-incoming
+	incoming     = !git-incoming
+
+	# Quickly view the latest commits in a multicolour oneliner format that
+	# highlights the parts I care about most: SHA, description and branch.
+	l = log --pretty=concise -n 20
+	
+	last = diff HEAD^                 # diff last committed change
+	
+	# Like "git l", but show all and draw the history graph, too.
+	ll = log --pretty=concise --graph
+#	ll = log --pretty=oneline --abbrev-commit --max-count=15
+
+    lg = log -p
+    
+    # log
+	log = log --decorate --graph --date=short
+
+	lol = log --graph --decorate --pretty=oneline --abbrev-commit
+    lola = log --graph --decorate --pretty=oneline --abbrev-commit --all
+
+    ls = ls-files
+
+	mt = mergetool                    # fire up the merge tool
+
+	nb = checkout -b                  # create and switch to a new branch (mnemonic: "git new branch branchname...")
+
+	out          = !git-outgoing
+	outgoing     = !git-outgoing
+
+	# pull
+	pl = pull                         # pull
+
+	# Quickly push to the most common destination.
+	pom = push origin master
+
+	# push
+	ps = push                         # push
+
+
+	# I know "pum" could just as well stand for "PUsh" instead of "PUll", but
+	# I am so used to "git pom" that "git pum" feels like a natural
+	# counterpart. I always try to rebase to prevent unnecessary merge
+	# commits.
+	pum = pull --rebase origin master
+
+	# remote
+	r = remote -v                     # show remotes (verbose)
+
+	# rebase
+	rc = rebase --continue            # continue rebase
+	rs = rebase --skip                # skip rebase
+
+	# status
+#	s = status --short --branch
+	s = status -sb -uno --ignore-submodules=untracked
+
+	# stash
+	sa = stash apply                  # apply stash (restore changes)
+#	sa = status -sb --ignore-submodules=untracked
+	sd = stash drop                   # drop stashes (destory changes)
+	
+	sh           = !git-sh
+
+	short = log --pretty=format:\"%h %cr %cn %Cgreen%s%Creset\"
+	shortnocolor = log --pretty=format:\"%h %cr %cn %s\"
+	
+	sl = stash list                   # list stashes
+	ss = stash                        # stash changes
+
+	st = status                       # status
+	stat = status                     # status
+
+	# Like "git show myfile", but uses the last commit that changed "myfile".
+	showlast = log -n 1 -p
+
+	# svn helpers
+	svnd = svn dcommit
+	svnl = svn log --oneline --show-commit
+	svnr = svn rebase
+
+	# tag
+	t = tag -n                        # show tags with <n> lines of each tag message
+    
+	thanks       = !git-thanks
+	track        = !git-track
+
+	# reset
+	unstage = reset HEAD              # remove files from index (tracking)
+	uncommit = reset --soft HEAD^     # go back before last commit, with files in uncommitted state
+
+    up = !sh -c 'git pull --rebase --prune && git log --pretty=format:\"%Cred%ae %Creset- %C(yellow)%s %Creset(%ar)\" HEAD@{1}..'
+    
+	w            = !hub browse
+	wip          = !git add -u && git commit -m ...
+	wipc         = !date >> WIP && git add WIP && git commit -m ...
+	x            = checkout HEAD
+
+#[apply]
+#	whitespace = fix
+#   whitespace = nowarn
+
+[branch]
+  autosetupmerge = true
+
+[core]
+	attributesfile = ~/.gitattributes
+	whitespace = fix,space-before-tab,tab-in-indent,trailing-space
+	repositoryformatversion = 0
+	filemode = true
+	bare = false
+	logallrefupdates = true
+	ignorecase = true
+	excludesfile = ~/.gitignore
+    editor = vim
+    pager = less -R
+    autocrlf = false
+
+
+[color]
+    diff = auto
+    status = auto
+    branch = auto
+    ui = auto
+[color "branch"]
+	current = yellow reverse
+#	local = yellow
+	local = yellow bold
+#	remote = green
+	remote = green bold
+	plain = red bold
+
+[color "diff"]
+	meta = yellow bold
+	frag = magenta bold
+	old = red bold
+	new = green bold
+#	meta = blue bold
+#	frag = magenta bold
+#	old = red bold
+#	new = green bold
+[color "status"]
+	added = yellow
+#	changed = green
+	changed = green bold
+#	untracked = cyan
+	untracked = blue bold
+
+[diff]
+  # Git diff will use (i)ndex, (w)ork tree, (c)ommit and (o)bject
+  # instead of a/b/c/d as prefixes for patches
+	mnemonicprefix = true
+	renames = copies
+
+[hub]
+	http-clone = true
+
+#[help]
+#	browser = open
+
+[merge]
+	tool = vimdiff
+	log = true
+	summary = true
+	verbosity = 1
+
+[pretty]
+	concise = %C(yellow)%h%C(reset) %s %C(bold black)(%an, %ar)%C(reset)%C(bold blue)%d%C(reset)
+	pretty = format:%C(blue)%ad%Creset %C(yellow)%h%C(green)%d%Creset %C(blue)%s %C(magenta) [%an]%Creset
+
+[push]
+	# Make "git push" or "git push <remote>" only push the current branch to
+	# the tracked branch (regardless of its remote name) as opposed to pushing
+	# all branches with a matching name on the remote. See "An asymmetry
+	# between git pull and push": http://longair.net/blog/?p=572
+	default = tracking
+#	default = matching
+#	default = current
+
+[rerere]
+  # Remember my merges
+  # http://gitfu.wordpress.com/2008/04/20/git-rerere-rereremember-what-you-did-last-time/
+  enabled = true
+
+[sendemail]
+	smtpserver = smtp.gmail.com
+	smtpserverport = 587
+	smtpencryption = tls
+	smtpuser = vasiliy.pisar@gmail.com
+
+[url "git@github.com:"]
+	insteadOf = "gh:"
+	pushInsteadOf = "github:"
+	pushInsteadOf = "git://github.com/"
+[url "git://github.com/"]
+	insteadOf = "github:"
+[url "git@gist.github.com:"]
+	insteadOf = "gst:"
+	pushInsteadOf = "gist:"
+	pushInsteadOf = "git://gist.github.com/"
+[url "git://gist.github.com/"]
+	insteadOf = "gist:"
+	
+# vim: noexpandtab

@@ -1,0 +1,34 @@
+# Ignore tags created by etags and ctags
+TAGS
+tags
+
+# Vim swap files
+.*.sw[a-z]
+*.un~
+Session.vim
+
+# Vim session files
+*.vimsession
+
+# Folder view configuration files
+.DS_Store
+Desktop.ini
+
+# Thumbnail cache files:
+# OS X
+._*
+# Windows
+Thumbs.db
+
+# Files that might appear on external disks
+.Spotlight-V100
+.Trashes
+
+# SVN files
+.svn
+
+# SASS
+.sass-cache
+
+*.log
+#*~
