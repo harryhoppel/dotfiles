@@ -78,6 +78,11 @@ alias stfu="osascript -e 'set volume output muted true'"
 alias pumpitup="osascript -e 'set volume 10'"
 alias hax="growlnotify -a 'Activity Monitor' 'System error' -m 'WTF R U DOIN'"
 
+# disk usage with human sizes and minimal depth
+alias du1='du -h --max-depth=1'
+alias fn='find . -name'
+alias hi='history | tail -20'
+
 vim=`type -P vim`
 if [ "$vim" == "" ]; then
     vim="gvim -v"
@@ -1132,3 +1137,97 @@ function unidecode() {
 	perl -e "binmode(STDOUT, ':utf8'); print \"$@\""
 	echo # newline
 }
+
+# LS AND DIRCOLORS
+# ----------------------------------------------------------------------
+
+# we always pass these to ls(1)
+LS_COMMON="-hBG"
+
+# if the dircolors utility is available, set that up to
+dircolors="$(type -P gdircolors dircolors | head -1)"
+test -n "$dircolors" && {
+    COLORS=/etc/DIR_COLORS
+    test -e "/etc/DIR_COLORS.$TERM"   && COLORS="/etc/DIR_COLORS.$TERM"
+    test -e "$HOME/.dircolors"        && COLORS="$HOME/.dircolors"
+    test ! -e "$COLORS"               && COLORS=
+    eval `$dircolors --sh $COLORS`
+}
+unset dircolors
+
+# setup the main ls alias if we've established common args
+test -n "$LS_COMMON" &&
+alias ls="command ls $LS_COMMON"
+
+# these use the ls aliases above
+alias ll="ls -l"
+alias l.="ls -d .*"
+
+# push SSH public key to another box
+push_ssh_cert() {
+    local _host
+    test -f ~/.ssh/id_dsa.pub || ssh-keygen -t dsa
+    for _host in "$@";
+    do
+        echo $_host
+        ssh $_host 'cat >> ~/.ssh/authorized_keys' < ~/.ssh/id_dsa.pub
+    done
+}
+
+# --------------------------------------------------------------------
+# PATH MANIPULATION FUNCTIONS
+# --------------------------------------------------------------------
+
+# Usage: pls [<var>]
+# List path entries of PATH or environment variable <var>.
+pls () { eval echo \$${1:-PATH} |tr : '\n'; }
+
+# Usage: pshift [-n <num>] [<var>]
+# Shift <num> entries off the front of PATH or environment var <var>.
+# with the <var> option. Useful: pshift $(pwd)
+pshift () {
+    local n=1
+    [ "$1" = "-n" ] && { n=$(( $2 + 1 )); shift 2; }
+    eval "${1:-PATH}='$(pls |tail -n +$n |tr '\n' :)'"
+}
+
+# Usage: ppop [-n <num>] [<var>]
+# Pop <num> entries off the end of PATH or environment variable <var>.
+ppop () {
+    local n=1 i=0
+    [ "$1" = "-n" ] && { n=$2; shift 2; }
+    while [ $i -lt $n ]
+    do eval "${1:-PATH}='\${${1:-PATH}%:*}'"
+       i=$(( i + 1 ))
+    done
+}
+
+# Usage: prm <path> [<var>]
+# Remove <path> from PATH or environment variable <var>.
+prm () { eval "${2:-PATH}='$(pls $2 |grep -v "^$1\$" |tr '\n' :)'"; }
+
+# Usage: punshift <path> [<var>]
+# Shift <path> onto the beginning of PATH or environment variable <var>.
+punshift () { eval "${2:-PATH}='$1:$(eval echo \$${2:-PATH})'"; }
+
+# Usage: ppush <path> [<var>]
+ppush () { eval "${2:-PATH}='$(eval echo \$${2:-PATH})':$1"; }
+
+# Usage: puniq [<path>]
+# Remove duplicate entries from a PATH style value while retaining
+# the original order. Use PATH if no <path> is given.
+#
+# Example:
+#   $ puniq /usr/bin:/usr/local/bin:/usr/bin
+#   /usr/bin:/usr/local/bin
+puniq () {
+    echo "$1" |tr : '\n' |nl |sort -u -k 2,2 |sort -n |
+    cut -f 2- |tr '\n' : |sed -e 's/:$//' -e 's/^://'
+}
+
+# use gem-man(1) if available:
+man () {
+    gem man -s "$@" 2>/dev/null ||
+    command man "$@"
+}
+
