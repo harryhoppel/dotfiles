@@ -88,6 +88,12 @@ FIGNORE="~:CVS:#:.pyc:.swp:.swa:apache-solr-*"
 HAVE_VIM=$(command -v vim)
 HAVE_GVIM=$(command -v gvim)
 
+export PATH=$HOME/bin:$HOME/bin/rar:/usr/local/mysql/bin:/usr/local/cuda/bin:/opt/local/bin:/opt/local/sbin:$PATH
+
+export DYLD_LIBRARY_PATH=/usr/local/cuda/lib:$DYLD_LIBRARY_PATH
+
+export MAVEN_OPTS="-Xms256m -Xmx512m"
+
 # EDITOR
 test -n "$HAVE_VIM" &&
 EDITOR=vim ||
@@ -284,5 +290,7 @@ test -n "$INTERACTIVE" -a -n "$LOGIN" && {
     uname -npsr
     uptime
 }
+
+test -r /sw/bin/init.sh && . /sw/bin/init.sh
 
 # vim: ts=4 sts=4 shiftwidth=4 expandtab
