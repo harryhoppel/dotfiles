@@ -259,6 +259,19 @@ export FONT_NORMAL="${FONT_NOT_BOLD}${FONT_NOT_UNDERLINE}${FONT_NOT_BLINK}${FONT
 test -r ~/.shenv &&
 . ~/.shenv
 
+# Usage: puniq [<path>]
+# Remove duplicate entries from a PATH style value while retaining
+# the original order. Use PATH if no <path> is given.
+#
+# Example:
+#   $ puniq /usr/bin:/usr/local/bin:/usr/bin
+#   /usr/bin:/usr/local/bin
+puniq () {
+  echo "$1" |tr : '\n' |nl |sort -u -k 2,2 |sort -n |
+  cut -f 2- |tr '\n' : |sed -e 's/:$//' -e 's/^://'
+}
+
+
 # condense PATH entries
 PATH=$(puniq $PATH)
 MANPATH=$(puniq $MANPATH)
