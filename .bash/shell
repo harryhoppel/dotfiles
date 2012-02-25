@@ -54,6 +54,8 @@ umask 0022
 PATH="$PATH:/usr/local/sbin:/usr/sbin:/sbin"
 PATH="/usr/local/bin:$PATH"
 
+PATH="/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/X11/bin:/usr/local/git/bin:$HOME/bin:/opt/local/bin:/opt/local/sbin:/sw/bin:/sw/sbin:$HOME/bin/rar:/usr/local/mysql/bin:/usr/local/cuda/bin:/usr/X11R6/bin"
+
 # put ~/bin on PATH if you have it
 test -d "$HOME/bin" &&
 PATH="$HOME/bin:$PATH"
@@ -115,6 +117,7 @@ ACK_PAGER="$PAGER"
 ACK_PAGER_COLOR="$PAGER"
 
 if [ "$UNAME" = Darwin ]; then
+    MANPATH="/usr/share/man:/usr/local/share/man:/usr/X11/share/man:/usr/local/git/share/man:/sw/share/man:/opt/local/share/man:/sw/lib/perl5/5.12.3/man:/usr/X11R6/man:$MANPATH"
     # put ports on the paths if /opt/local exists
     test -x /opt/local -a ! -L /opt/local && {
         PORTS=/opt/local
