@@ -30,7 +30,6 @@ set match-hidden-files off
 set page-completions off
 
 set horizontal-scroll-mode off
-set history-preserve-point on
 set mark-directories on
 set mark-symlinked-directories on
 
@@ -62,7 +61,7 @@ set skip-completed-text on
 
 # Add tab completion for `defaults read|write NSGlobalDomain`
 # You could just use `-g` instead, but I like being explicit
-complete -W "NSGlobalDomain" defaults
+#complete -W "NSGlobalDomain" defaults
 
 # Line editing
 # -----------------------------------------------------------------------------
@@ -106,7 +105,7 @@ set expand-tilde off
 # Adds punctuation as word delimiters
 set bind-tty-special-chars off
 
-set editing-mode vi
+#set editing-mode vi
 
 $if mode=vi
     set keymap vi-command
@@ -123,7 +122,7 @@ $if mode=vi
     "\C-a":yank-last-arg
 $endif
 
-#set editing-mode emacs
+set editing-mode emacs
 
 # reload file
 #"\C-x\C-r": re-read-init-file
@@ -135,9 +134,6 @@ $if mode=emacs
 
 # make control-tab complete from history
 # C-TAB: dynamic-complete-history
-
-"\e[A": history-search-backward
-"\e[B": history-search-forward
 
 # for linux console and RH/Debian xterm
 "\e[1~": beginning-of-line
