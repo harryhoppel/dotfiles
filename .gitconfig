@@ -184,7 +184,6 @@
 	excludesfile = ~/.gitignore
     editor = vim
     pager = less -R
-    autocrlf = false
 
 
 [color]
