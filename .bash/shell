@@ -208,7 +208,7 @@ export HISTCONTROL=ignoredups;
 export HISTTIMEFORMAT=$'\e[1;30m%Y/%m/%d %H:%M:%S\e[0m  ';
 
 # Make some commands not show up in history
-export HISTIGNORE="ls:ls *:cd:cd -:pwd;exit:date:* --help"
+#export HISTIGNORE="ls:ls *:cd:cd -:pwd;exit:date:* --help"
 
 # don't put duplicate lines in the history. See bash(1) for more options
 # don't overwrite GNU Midnight Commander's setting of `ignorespace'.
